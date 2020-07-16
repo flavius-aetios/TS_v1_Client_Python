@@ -46,15 +46,15 @@ text_to_value = {
 
 layout = [
     [sg.Text('Порт:', size=(16, 1)), sg.Text('Ослабление:', size=(10, 1)),],
-    [sg.Combo(getComPortsList(), size=(6, 5), key='COM'), sg.Button('Обновить', button_color=('black', '#DCDCDC')),
-     sg.Combo(combo_list, size=(6, 10), key='ATT'), sg.Radio('Значение ослабления из списка', "RADIO1", key='Radio_combo')],
-    [sg.Text('DAC Value (0-4095):', size=(16, 1)), sg.InputText(size=(8, 1), key='text_DAC_val'), sg.Radio('Ввод значения', "RADIO1", key='Radio_dac_val', default=True)],
-    [sg.Output(size=(66, 12))],
-    [sg.Submit('Подтвердить')]
+    [sg.Combo(getComPortsList(), size=(6, 5), readonly=True, key='COM'), sg.Button('Обновить', button_color=('black', '#DCDCDC')),
+     sg.Combo(combo_list, size=(6, 10), readonly=True, key='ATT'), sg.Radio('Значение ослабления из списка', "RADIO1", key='Radio_combo', default=True)],
+    [sg.Text('DAC Value (0-4095):', size=(16, 1)), sg.InputText(size=(8, 1), key='text_DAC_val'), sg.Radio('Значение ЦАП', "RADIO1", key='Radio_dac_val')],
+    [sg.Output(size=(66, 10))],
+    [sg.Submit('Подтвердить', pad=((405,0),1))]
 ]
 
-sg.set_global_icon(icon = r'Terminal3.ico')
-window = sg.Window('Com Terminal', layout)
+sg.set_global_icon(icon = r'Terminal.ico')
+window = sg.Window('TS_v1 COM Terminal', layout)
 
 while True:
     event, values = window.read()
@@ -75,6 +75,9 @@ while True:
         if values['Radio_dac_val'] is True and values['text_DAC_val'] == '':
             print('Введите значение DAC value!')
             continue
+        if values['text_DAC_val'].isdigit() == False or int(values['text_DAC_val']) < 0 or int(values['text_DAC_val']) > 4095:
+            print('Введите корректное значение DAC value (0-4095) !')
+            continue
 
         #Инициализация COM порта
         ser = serial.Serial()
@@ -91,16 +94,27 @@ while True:
 
         if values['Radio_combo'] is True:
             msg = bytes(text_to_value[values['ATT']].encode('utf-8'))
-            ser.write(msg)
-            ser.close()
+            try:
+                ser.write(msg)
+                ser.close()
+            except:
+                print("При передаче возникла ошибка! Порт " + values['COM'] + " недоступен!")
+                continue
+
             print("Сигнал ослаблен на: " + values['ATT'])
             continue
 
+
         if values['Radio_dac_val'] is True:
             msg = bytes(values['text_DAC_val'].encode('utf-8'))
-            ser.write(msg)
-            ser.close()
-            print("Значение ЦАП: " + values['text_DAC_val'])
+            try:
+                ser.write(msg)
+                ser.close()
+            except:
+                print("При передаче возникла ошибка! Порт " + values['COM'] + " недоступен!")
+                continue
+
+            print("Задано значение ЦАП: " + values['text_DAC_val'])
             continue
 
 window.close()
