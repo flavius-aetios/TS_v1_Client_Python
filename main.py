@@ -27,34 +27,34 @@ text_to_value = {
     'REF': '4095',
     '1dB': '4095',
     '2dB': '4095',
-    '3dB': '3935',
-    '4dB': '3740',
-    '5dB': '3550',
-    '6dB': '3360',
-    '7dB': '3155',
-    '8dB': '2910',
-    '9dB': '2620',
-    '10dB': '2255',
-    '11dB': '1855',
-    '12dB': '1443',
-    '13dB': '1125',
-    '14dB': '862',
-    '15dB': '630',
-    '16dB': '402',
-    '17dB': '169',
+    '3dB': '3900',
+    '4dB': '3700',
+    '5dB': '3510',
+    '6dB': '3305',
+    '7dB': '3090',
+    '8dB': '2830',
+    '9dB': '2470',
+    '10dB': '1950',
+    '11dB': '1350',
+    '12dB': '950',
+    '13dB': '700',
+    '14dB': '530',
+    '15dB': '395',
+    '16dB': '265',
+    '17dB': '120',
 }
 
 layout = [
     [sg.Text('Порт:', size=(16, 1)), sg.Text('Ослабление:', size=(10, 1)),],
     [sg.Combo(getComPortsList(), size=(6, 5), readonly=True, key='COM'), sg.Button('Обновить', button_color=('black', '#DCDCDC')),
      sg.Combo(combo_list, size=(6, 10), readonly=True, key='ATT'), sg.Radio('Значение ослабления из списка', "RADIO1", key='Radio_combo', default=True)],
-    [sg.Text('DAC Value (0-4095):', size=(16, 1)), sg.InputText(size=(8, 1), key='text_DAC_val'), sg.Radio('Значение ЦАП', "RADIO1", key='Radio_dac_val')],
+    [sg.Text('DAC Value (0-4095):', size=(15, 1), pad=((5,15),0)), sg.InputText(size=(8, 1), key='text_DAC_val'), sg.Radio('Значение ЦАП', "RADIO1", key='Radio_dac_val')],
     [sg.Output(size=(66, 10))],
     [sg.Submit('Подтвердить', pad=((405,0),1))]
 ]
 
 sg.set_global_icon(icon = r'Terminal.ico')
-window = sg.Window('TS_v1 COM Terminal', layout)
+window = sg.Window('TS_v1 COM Terminal', layout, icon="Terminal.ico")
 
 while True:
     event, values = window.read()
@@ -75,7 +75,8 @@ while True:
         if values['Radio_dac_val'] is True and values['text_DAC_val'] == '':
             print('Введите значение DAC value!')
             continue
-        if values['text_DAC_val'].isdigit() == False or int(values['text_DAC_val']) < 0 or int(values['text_DAC_val']) > 4095:
+        if values['Radio_dac_val'] is True and \
+                (values['text_DAC_val'].isdigit() == False or int(values['text_DAC_val']) < 0 or int(values['text_DAC_val']) > 4095):
             print('Введите корректное значение DAC value (0-4095) !')
             continue
 
